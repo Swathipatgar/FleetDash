@@ -1,10 +1,44 @@
-const express = require("express");
-const router = express.Router();
+const Vehicle = require("../models/Vehicle");
 
-const {
-    getVehicles
-} = require("../controllers/vehicleController");
+// GET All Vehicles
+const getVehicles = async (req, res) => {
+    try {
+        const vehicles = await Vehicle.find();
 
-router.get("/", getVehicles);
+        res.status(200).json({
+            success: true,
+            totalVehicles: vehicles.length,
+            data: vehicles
+        });
 
-module.exports = router;
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+
+// CREATE Vehicle
+const createVehicle = async (req, res) => {
+    try {
+        const vehicle = await Vehicle.create(req.body);
+
+        res.status(201).json({
+            success: true,
+            message: "Vehicle Added Successfully",
+            data: vehicle
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+
+module.exports = {
+    getVehicles,
+    createVehicle
+};

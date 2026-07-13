@@ -6,6 +6,11 @@ const cors = require("cors");
 // Import Database Connection
 const connectDB = require("./config/database");
 
+// Import Routes
+const vehicleRoutes = require("./routes/vehicleRoutes");
+const dashboardRoutes = require("./routes/dashboardRoutes");
+
+// Initialize Express App
 const app = express();
 
 // Connect Database
@@ -16,10 +21,7 @@ app.use(cors());
 app.use(express.json());
 
 // Routes
-const vehicleRoutes = require("./routes/vehicleRoutes");
-const dashboardRoutes = require("./routes/dashboardRoutes");
-
-app.use("/api/vehicles", vehicleRoutes);
+//app.use("/api/vehicles", vehicleRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 
 // Home Route
