@@ -1,6 +1,7 @@
+const mongoose = require("mongoose");
 const Vehicle = require("../models/Vehicle");
 
-// GET All Vehicles
+// ================= GET ALL VEHICLES =================
 const getVehicles = async (req, res) => {
     try {
         const vehicles = await Vehicle.find();
@@ -19,9 +20,19 @@ const getVehicles = async (req, res) => {
     }
 };
 
-// CREATE Vehicle
+// ================= CREATE VEHICLE =================
 const createVehicle = async (req, res) => {
     try {
+
+        const { vehicleNumber, driver } = req.body;
+
+        if (!vehicleNumber || !driver) {
+            return res.status(400).json({
+                success: false,
+                message: "Vehicle number and driver name are required."
+            });
+        }
+
         const vehicle = await Vehicle.create(req.body);
 
         res.status(201).json({
@@ -37,7 +48,16 @@ const createVehicle = async (req, res) => {
         });
     }
 };
+
+// ================= GET VEHICLE BY ID =================
 const getVehicleById = async (req, res) => {
+
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+        return res.status(400).json({
+            success: false,
+            message: "Invalid Vehicle ID"
+        });
+    }
 
     try {
 
@@ -56,17 +76,22 @@ const getVehicleById = async (req, res) => {
         });
 
     } catch (error) {
-
         res.status(500).json({
             success: false,
             message: error.message
         });
-
     }
-
 };
 
+// ================= UPDATE VEHICLE =================
 const updateVehicle = async (req, res) => {
+
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+        return res.status(400).json({
+            success: false,
+            message: "Invalid Vehicle ID"
+        });
+    }
 
     try {
 
@@ -93,17 +118,22 @@ const updateVehicle = async (req, res) => {
         });
 
     } catch (error) {
-
         res.status(500).json({
             success: false,
             message: error.message
         });
-
     }
-
 };
 
+// ================= DELETE VEHICLE =================
 const deleteVehicle = async (req, res) => {
+
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+        return res.status(400).json({
+            success: false,
+            message: "Invalid Vehicle ID"
+        });
+    }
 
     try {
 
@@ -122,15 +152,13 @@ const deleteVehicle = async (req, res) => {
         });
 
     } catch (error) {
-
         res.status(500).json({
             success: false,
             message: error.message
         });
-
     }
-
 };
+
 module.exports = {
     getVehicles,
     createVehicle,

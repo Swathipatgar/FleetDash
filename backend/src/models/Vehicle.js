@@ -47,73 +47,33 @@ const createVehicle = async (req, res) => {
     }
 
 };
+const mongoose = require("mongoose");
+
+const vehicleSchema = new mongoose.Schema({
+    vehicleNumber: {
+        type: String,
+        required: [true, "Vehicle number is required"],
+        unique: true,
+        trim: true
+    },
+    driver: {
+        type: String,
+        required: [true, "Driver name is required"],
+        trim: true
+    },
+    status: {
+        type: String,
+        enum: ["Active", "Inactive"],
+        default: "Active"
+    }
+}, {
+    timestamps: true
+});
+
+module.exports = mongoose.model("Vehicle", vehicleSchema);
+
 
 module.exports = {
     getVehicles,
     createVehicle
-};
-const updateVehicle = async (req, res) => {
-
-    try {
-
-        const vehicle = await Vehicle.findByIdAndUpdate(
-            req.params.id,
-            req.body,
-            {
-                new: true,
-                runValidators: true
-            }
-        );
-
-        if (!vehicle) {
-            return res.status(404).json({
-                success: false,
-                message: "Vehicle not found"
-            });
-        }
-
-        res.status(200).json({
-            success: true,
-            message: "Vehicle Updated Successfully",
-            data: vehicle
-        });
-
-    } catch (error) {
-
-        res.status(500).json({
-            success: false,
-            message: error.message
-        });
-
-    }
-
-};
-
-const deleteVehicle = async (req, res) => {
-
-    try {
-
-        const vehicle = await Vehicle.findByIdAndDelete(req.params.id);
-
-        if (!vehicle) {
-            return res.status(404).json({
-                success: false,
-                message: "Vehicle not found"
-            });
-        }
-
-        res.status(200).json({
-            success: true,
-            message: "Vehicle Deleted Successfully"
-        });
-
-    } catch (error) {
-
-        res.status(500).json({
-            success: false,
-            message: error.message
-        });
-
-    }
-
 };
