@@ -35,6 +35,14 @@ const createVehicle = async (req, res) => {
 
         const vehicle = await Vehicle.create(req.body);
 
+        // Emit realtime update to connected clients
+        try {
+            const io = req.app && req.app.get && req.app.get('io');
+            if (io) io.emit('vehicle:updated', vehicle);
+        } catch (err) {
+            console.error('Failed to emit vehicle:create event', err);
+        }
+
         res.status(201).json({
             success: true,
             message: "Vehicle Added Successfully",
@@ -109,6 +117,14 @@ const updateVehicle = async (req, res) => {
                 success: false,
                 message: "Vehicle not found"
             });
+        }
+
+        // Emit realtime update to connected clients
+        try {
+            const io = req.app && req.app.get && req.app.get('io');
+            if (io) io.emit('vehicle:updated', vehicle);
+        } catch (err) {
+            console.error('Failed to emit vehicle:update event', err);
         }
 
         res.status(200).json({
