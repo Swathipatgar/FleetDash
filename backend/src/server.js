@@ -21,7 +21,7 @@ app.use(cors());
 app.use(express.json());
 
 // Routes
-//app.use("/api/vehicles", vehicleRoutes);
+app.use("/api/vehicles", vehicleRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 
 // Home Route
