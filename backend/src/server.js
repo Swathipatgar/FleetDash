@@ -3,12 +3,15 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 
+
 // Import Database Connection
 const connectDB = require("./config/database");
 
 // Import Routes
 const vehicleRoutes = require("./routes/vehicleRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
+const driverRoutes = require("./routes/driverRoutes");
+
 
 // Initialize Express App
 const app = express();
@@ -23,6 +26,7 @@ app.use(express.json());
 // Routes
 app.use("/api/vehicles", vehicleRoutes);
 app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/drivers", driverRoutes);
 
 // Home Route
 app.get("/", (req, res) => {
