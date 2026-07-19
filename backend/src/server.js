@@ -11,7 +11,7 @@ const connectDB = require("./config/database");
 const vehicleRoutes = require("./routes/vehicleRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
 const driverRoutes = require("./routes/driverRoutes");
-
+const tripRoutes = require("./routes/tripRoutes");
 
 // Initialize Express App
 const app = express();
@@ -27,6 +27,7 @@ app.use(express.json());
 app.use("/api/vehicles", vehicleRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/drivers", driverRoutes);
+app.use("/api/trips", tripRoutes);
 
 // Home Route
 app.get("/", (req, res) => {
