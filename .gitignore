@@ -12,3 +12,7 @@ backend/.env
 # OS files
 .DS_Store
 Thumbs.db
+# Frontend generated files
+frontend/node_modules/
+frontend/dist/
+frontend/.env
