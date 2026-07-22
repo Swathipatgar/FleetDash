@@ -1,6 +1,8 @@
 const { updateVehicleLocation } = require("../../services/vehicleService");
 const { checkGeofence } = require("../services/geofenceService");
 
+const lastUpdate = Object.create(null);
+const LOCATION_UPDATE_INTERVAL_MS = 100;
 const isFiniteNumber = (value) => typeof value === "number" && Number.isFinite(value);
 const isFleetId = (value) => typeof value === "string" && value.trim().length > 0;
 
@@ -26,22 +28,27 @@ module.exports = (io, socket) => {
     const isValid = isFleetId(fleetId) && typeof vehicleId === "string" && vehicleId.trim() &&
       isFiniteNumber(latitude) && latitude >= -90 && latitude <= 90 &&
       isFiniteNumber(longitude) && longitude >= -180 && longitude <= 180 &&
-      (speed === undefined || (isFiniteNumber(speed) && speed >= 0));
+      isFiniteNumber(speed) && speed >= 0;
 
     if (!isValid) {
-      const error = "fleetId, vehicleId, valid latitude/longitude, and a non-negative numeric speed are required.";
+      const error = "Invalid vehicle location data.";
       if (typeof acknowledge === "function") acknowledge({ ok: false, error });
-      return socket.emit("vehicle:location:error", { error });
+      return socket.emit("error", { message: error });
     }
 
+    const now = Date.now();
+    if (lastUpdate[socket.id] && now - lastUpdate[socket.id] < LOCATION_UPDATE_INTERVAL_MS) {
+      const error = "Location updates are limited to one every 100 ms.";
+      if (typeof acknowledge === "function") acknowledge({ ok: false, error, rateLimited: true });
+      return;
+    }
+    lastUpdate[socket.id] = now;
+
     const room = fleetId.trim();
-    const vehicle = updateVehicleLocation(room, vehicleId.trim(), { latitude, longitude, ...(speed === undefined ? {} : { speed }) });
+    const vehicle = updateVehicleLocation(room, vehicleId.trim(), { latitude, longitude, speed });
     io.to(room).emit("vehicle:location", vehicle);
 
-    const geofenceEvent = checkGeofence(`${room}:${vehicle.vehicleId}`, {
-      latitude,
-      longitude,
-    });
+    const geofenceEvent = checkGeofence(`${room}:${vehicle.vehicleId}`, { latitude, longitude });
     if (geofenceEvent) {
       const alert = { fleetId: room, vehicleId: vehicle.vehicleId, location: vehicle.location, occurredAt: new Date(), ...geofenceEvent };
       io.to(room).emit("geofence:alert", alert);
@@ -52,5 +59,7 @@ module.exports = (io, socket) => {
     if (typeof acknowledge === "function") acknowledge({ ok: true, vehicle });
   });
 
-  socket.on("disconnect", () => console.log(`Disconnected: ${socket.id}`));
+  socket.on("disconnect", () => {
+    delete lastUpdate[socket.id];
+  });
 };

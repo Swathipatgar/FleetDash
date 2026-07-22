@@ -3,7 +3,29 @@ import { SOCKET_EVENTS } from "./socketEvents";
 
 const SOCKET_URL = process.env.REACT_APP_SOCKET_URL || "http://localhost:5000";
 
-export const socket = io(SOCKET_URL, { transports: ["websocket"] });
+export const socket = io(SOCKET_URL, {
+  transports: ["websocket"],
+  reconnection: true,
+  reconnectionAttempts: 5,
+  reconnectionDelay: 1000,
+});
+
+socket.io.on("reconnect", () => console.log("Reconnected"));
+socket.io.on("reconnect_attempt", () => console.log("Trying to reconnect..."));
+socket.io.on("reconnect_failed", () => console.log("Unable to reconnect"));
+
+socket.on("reconnect", () => {
+    console.log("Reconnected");
+});
+
+socket.on("reconnect_attempt", () => {
+    console.log("Trying to reconnect...");
+});
+
+socket.on("reconnect_failed", () => {
+    console.log("Unable to reconnect");
+});
+
 
 export const subscribeToSocket = (event, handler) => {
   socket.on(event, handler);

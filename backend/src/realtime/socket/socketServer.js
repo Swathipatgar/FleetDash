@@ -9,7 +9,16 @@ function initializeSocket(server) {
     },
   });
 
-  io.on("connection", (socket) => registerSocketHandlers(io, socket));
+  io.on("connection", (socket) => {
+    socket.on("error", (err) => {
+      console.error(`Socket ${socket.id}:`, err?.message || err);
+    });
+    socket.on("disconnect", (reason) => {
+      console.log(`${socket.id} disconnected: ${reason}`);
+    });
+    registerSocketHandlers(io, socket);
+  });
+
   return io;
 }
 
