@@ -9,6 +9,13 @@ const registerUser = async (req, res) => {
 
         const { name, email, password, role } = req.body;
 
+        if (!name || !email || !password) {
+            return res.status(400).json({
+                success: false,
+                message: "Name, email and password are required"
+            });
+        }
+
         const userExists = await User.findOne({ email });
 
         if (userExists) {
@@ -30,7 +37,12 @@ const registerUser = async (req, res) => {
         res.status(201).json({
             success: true,
             message: "User Registered Successfully",
-            data: user
+            data: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                role: user.role
+            }
         });
 
     } catch (error) {
@@ -43,6 +55,7 @@ const registerUser = async (req, res) => {
     }
 
 };
+
 
 // LOGIN USER
 const loginUser = async (req, res) => {
