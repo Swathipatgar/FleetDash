@@ -3,6 +3,22 @@ import { useSocket } from "../../context/SocketContext";
 import { useVehicleLocations } from "../../hooks/useVehicleLocations";
 import { Wifi, WifiOff, RefreshCw, Cpu, Activity, Info, MapPin, Send, Gauge } from "lucide-react";
 
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
+import L from "leaflet";
+
+import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
+import markerIcon from "leaflet/dist/images/marker-icon.png";
+import markerShadow from "leaflet/dist/images/marker-shadow.png";
+
+delete L.Icon.Default.prototype._getIconUrl;
+
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: markerIcon2x,
+  iconUrl: markerIcon,
+  shadowUrl: markerShadow,
+});
+
 const sampleLocation = {
   fleetId: "fleet-001",
   vehicleId: "VH001",
@@ -59,7 +75,7 @@ function Dashboard() {
         <div className="status-card glass"><div className="card-header"><Info className="card-icon" /><h3>Live fleet feed</h3></div><div className="card-body">
           <div className="stat-row"><span className="label">Tracked vehicles</span><b>{vehicles.length}</b></div>
           <div className="stat-row"><span className="label">Joined fleet</span><span className="font-mono text-small">{joinedFleet || "None"}</span></div>
-          <div className="stat-row"><span className="label">Latest event</span><span className="text-small">{events[0] ? new Date(events[0].updatedAt).toLocaleTimeString() : "Waiting…"}</span></div>
+          <div className="stat-row"><span className="label">Latest event</span><span className="text-small">{events[0] ? new Date(events[0].updatedAt).toLocaleTimeString() : "Waitingï¿½"}</span></div>
         </div></div>
       </section>
 
@@ -75,15 +91,39 @@ function Dashboard() {
         </form>
         <section className="status-card glass live-locations"><div className="card-header"><MapPin className="card-icon" /><h3>Latest vehicle locations</h3></div>
           {!vehicles.length && <p className="empty-state">No location updates received yet.</p>}
-          {vehicles.map((vehicle) => <article className="location-row" key={`${vehicle.fleetId}-${vehicle.vehicleId}`}><MapPin size={17} /><div><b>{vehicle.vehicleId} <small>· {vehicle.fleetId}</small></b><small>{vehicle.location.latitude.toFixed(5)}, {vehicle.location.longitude.toFixed(5)}</small></div><span><Gauge size={15} /> {vehicle.location.speed ?? 0} km/h</span><time>{new Date(vehicle.updatedAt).toLocaleTimeString()}</time></article>)}
+          {vehicles.map((vehicle) => <article className="location-row" key={`${vehicle.fleetId}-${vehicle.vehicleId}`}><MapPin size={17} /><div><b>{vehicle.vehicleId} <small>ï¿½ {vehicle.fleetId}</small></b><small>{vehicle.location.latitude.toFixed(5)}, {vehicle.location.longitude.toFixed(5)}</small></div><span><Gauge size={15} /> {vehicle.location.speed ?? 0} km/h</span><time>{new Date(vehicle.updatedAt).toLocaleTimeString()}</time></article>)}
         </section>
       </section>
+      <section className="status-card glass">
+  <div className="card-header">
+    <MapPin className="card-icon" />
+    <h3>Fleet Live Map</h3>
+  </div>
+
+  <MapContainer
+    center={[12.9716, 77.5946]}
+    zoom={12}
+    style={{ height: "400px", width: "100%", borderRadius: "10px" }}
+  >
+    <TileLayer
+      attribution='&copy; OpenStreetMap contributors'
+      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+    />
+
+    <Marker position={[12.9716, 77.5946]}>
+      <Popup>
+        FleetDash Vehicle
+      </Popup>
+    </Marker>
+
+  </MapContainer>
+</section>
 
       <section className="terminal-panel glass"><div className="terminal-header"><span className="dot red" /><span className="dot yellow" /><span className="dot green" /><span className="terminal-title">Geofence Alerts</span></div>
         <div className="terminal-body font-mono">{!alerts.length ? <div className="terminal-line timestamp">No geofence alerts received.</div> : alerts.map((alert) => <div className={alert.event === "entered" ? "terminal-line success" : "terminal-line danger"} key={`${alert.fleetId}-${alert.vehicleId}-${alert.geofenceId}-${alert.occurredAt}`}>[{new Date(alert.occurredAt).toISOString()}] {alert.event === "entered" ? "[ENTERED]" : "[EXITED]"} {alert.vehicleId} {alert.event} {alert.geofenceId.charAt(0).toUpperCase() + alert.geofenceId.slice(1)} ({alert.distance}m away)</div>)}</div>
       </section>
       <section className="terminal-panel glass"><div className="terminal-header"><span className="dot red" /><span className="dot yellow" /><span className="dot green" /><span className="terminal-title">Vehicle Location Event Stream</span></div>
-        <div className="terminal-body font-mono">{!events.length ? <div className="terminal-line timestamp">Waiting for fleet-scoped vehicle:location events…</div> : events.map((event) => <div className="terminal-line success" key={`${event.fleetId}-${event.vehicleId}-${event.updatedAt}`}>[{new Date(event.updatedAt).toISOString()}] {event.fleetId}/{event.vehicleId}: {event.location.latitude}, {event.location.longitude} · {event.location.speed ?? 0} km/h</div>)}</div>
+        <div className="terminal-body font-mono">{!events.length ? <div className="terminal-line timestamp">Waiting for fleet-scoped vehicle:location eventsï¿½</div> : events.map((event) => <div className="terminal-line success" key={`${event.fleetId}-${event.vehicleId}-${event.updatedAt}`}>[{new Date(event.updatedAt).toISOString()}] {event.fleetId}/{event.vehicleId}: {event.location.latitude}, {event.location.longitude} ï¿½ {event.location.speed ?? 0} km/h</div>)}</div>
       </section>
     </main>
   </div>;
