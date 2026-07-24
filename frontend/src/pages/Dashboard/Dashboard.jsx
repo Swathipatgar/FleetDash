@@ -3,7 +3,7 @@ import { useSocket } from "../../context/SocketContext";
 import { useVehicleLocations } from "../../hooks/useVehicleLocations";
 import { Wifi, WifiOff, RefreshCw, Cpu, Activity, Info, MapPin, Send, Gauge } from "lucide-react";
 
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, useMap, Circle} from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 
@@ -114,6 +114,15 @@ function Dashboard() {
     zoom={12}
     style={{ height: "400px", width: "100%", borderRadius: "10px" }}
   >
+    <Circle
+  center={[12.9716, 77.5946]}
+  radius={1000}
+  pathOptions={{
+    color: "red",
+    fillColor: "red",
+    fillOpacity: 0.2
+  }}
+/>
     <ChangeMapView
   center={[
     location.latitude,
