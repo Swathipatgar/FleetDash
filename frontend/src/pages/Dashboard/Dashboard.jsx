@@ -3,7 +3,7 @@ import { useSocket } from "../../context/SocketContext";
 import { useVehicleLocations } from "../../hooks/useVehicleLocations";
 import { Wifi, WifiOff, RefreshCw, Cpu, Activity, Info, MapPin, Send, Gauge } from "lucide-react";
 
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 
@@ -26,6 +26,15 @@ const sampleLocation = {
   longitude: 77.5946,
   speed: 72,
 };
+function ChangeMapView({ center }) {
+  const map = useMap();
+
+  React.useEffect(() => {
+    map.setView(center, map.getZoom());
+  }, [center, map]);
+
+  return null;
+}
 
 function Dashboard() {
   const { isConnected, transport, reconnectAttempts, socket } = useSocket();
@@ -42,7 +51,7 @@ function Dashboard() {
     setSendError("");
     joinFleet(location.fleetId, (result) => {
       if (!result?.ok) setSendError(result?.error || "Unable to join fleet.");
-    });
+    }); 
   };
   const publishLocation = (event) => {
     event.preventDefault();
@@ -105,16 +114,37 @@ function Dashboard() {
     zoom={12}
     style={{ height: "400px", width: "100%", borderRadius: "10px" }}
   >
+    <ChangeMapView
+  center={[
+    location.latitude,
+    location.longitude,
+  ]}
+/>
+
     <TileLayer
       attribution='&copy; OpenStreetMap contributors'
       url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
     />
 
-    <Marker position={[12.9716, 77.5946]}>
-      <Popup>
-        FleetDash Vehicle
-      </Popup>
-    </Marker>
+    {vehicles.map((vehicle) => (
+  <Marker
+    key={vehicle.vehicleId}
+    position={[
+      vehicle.location.latitude,
+      vehicle.location.longitude,
+    ]}
+  >
+    <Popup>
+      <div>
+        <strong>{vehicle.vehicleId}</strong>
+        <br />
+        Fleet: {vehicle.fleetId}
+        <br />
+        Speed: {vehicle.location.speed} km/h
+      </div>
+    </Popup>
+  </Marker>
+))}
 
   </MapContainer>
 </section>
