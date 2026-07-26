@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useSocket } from "../../context/SocketContext";
 import { useVehicleLocations } from "../../hooks/useVehicleLocations";
 import { Wifi, WifiOff, RefreshCw, Cpu, Activity, Info, MapPin, Send, Gauge } from "lucide-react";
-
+import { geofence } from "../../utils/geofence.js";
 import {
   MapContainer,
   TileLayer,
@@ -17,6 +17,7 @@ import L from "leaflet";
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
+import { isVehicleInsideGeofence } from "../../utils/geofenceHelper";
 
 delete L.Icon.Default.prototype._getIconUrl;
 
@@ -142,25 +143,38 @@ function Dashboard() {
       url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
     />
 
-    {vehicles.map((vehicle) => (
-  <Marker
-    key={vehicle.vehicleId}
-    position={[
-      vehicle.location.latitude,
-      vehicle.location.longitude,
-    ]}
-  >
+   {vehicles.map((vehicle) => {
+
+  const inside = isVehicleInsideGeofence(
+    vehicle.location.latitude,
+    vehicle.location.longitude,
+    geofence
+  );
+
+  return (
+    <Marker
+      key={vehicle.vehicleId}
+      position={[
+        vehicle.location.latitude,
+        vehicle.location.longitude,
+      ]}
+    >
     <Popup>
-      <div>
-        <strong>{vehicle.vehicleId}</strong>
-        <br />
-        Fleet: {vehicle.fleetId}
-        <br />
-        Speed: {vehicle.location.speed} km/h
-      </div>
-    </Popup>
+  <div>
+    <strong>{vehicle.vehicleId}</strong>
+    <br />
+    Fleet: {vehicle.fleetId}
+    <br />
+    Speed: {vehicle.location.speed} km/h
+    <br />
+    <strong>
+      Status: {inside ? "🟢 Inside Geofence" : "🔴 Outside Geofence"}
+    </strong>
+  </div>
+</Popup>
   </Marker>
-))}
+  );
+})}
 
   </MapContainer>
 </section>
