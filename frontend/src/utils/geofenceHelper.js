@@ -1,6 +1,10 @@
 import * as turf from "@turf/turf";
 
-export const isVehicleInsideGeofence = (latitude, longitude, geofence) => {
+export const isVehicleInsideGeofence = (
+  latitude,
+  longitude,
+  geofence
+) => {
   const point = turf.point([longitude, latitude]);
 
   const circle = turf.circle(

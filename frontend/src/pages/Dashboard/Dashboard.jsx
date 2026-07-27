@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useSocket } from "../../context/SocketContext";
 import { useVehicleLocations } from "../../hooks/useVehicleLocations";
 import { Wifi, WifiOff, RefreshCw, Cpu, Activity, Info, MapPin, Send, Gauge } from "lucide-react";
-import { geofence } from "../../utils/geofence.js";
+
 import {
   MapContainer,
   TileLayer,
@@ -11,13 +11,16 @@ import {
   Circle,
   useMap,
 } from "react-leaflet";
+
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
+
+import { geofence } from "../../utils/geofence";
+import { isVehicleInsideGeofence } from "../../utils/geofenceHelper";
 
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
-import { isVehicleInsideGeofence } from "../../utils/geofenceHelper";
 
 delete L.Icon.Default.prototype._getIconUrl;
 
@@ -123,12 +126,12 @@ function Dashboard() {
     style={{ height: "400px", width: "100%", borderRadius: "10px" }}
   >
     <Circle
-  center={[12.9716, 77.5946]}
-  radius={1000}
+  center={geofence.center}
+  radius={geofence.radius}
   pathOptions={{
     color: "red",
     fillColor: "red",
-    fillOpacity: 0.2
+    fillOpacity: 0.2,
   }}
 />
     <ChangeMapView
@@ -159,21 +162,31 @@ function Dashboard() {
         vehicle.location.longitude,
       ]}
     >
-    <Popup>
-  <div>
-    <strong>{vehicle.vehicleId}</strong>
-    <br />
-    Fleet: {vehicle.fleetId}
-    <br />
-    Speed: {vehicle.location.speed} km/h
-    <br />
-    <strong>
-      Status: {inside ? "🟢 Inside Geofence" : "🔴 Outside Geofence"}
-    </strong>
-  </div>
-</Popup>
-  </Marker>
+      <Popup>
+        <div>
+          <strong>{vehicle.vehicleId}</strong>
+
+          <br />
+
+          Fleet: {vehicle.fleetId}
+
+          <br />
+
+          Speed: {vehicle.location.speed} km/h
+
+          <br />
+
+          <strong>
+            Status:
+            {inside
+              ? " 🟢 Inside Geofence"
+              : " 🔴 Outside Geofence"}
+          </strong>
+        </div>
+      </Popup>
+    </Marker>
   );
+
 })}
 
   </MapContainer>
