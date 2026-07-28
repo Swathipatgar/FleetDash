@@ -125,13 +125,14 @@ function Dashboard() {
     zoom={12}
     style={{ height: "400px", width: "100%", borderRadius: "10px" }}
   >
-    <Circle
+  <Circle
   center={geofence.center}
   radius={geofence.radius}
   pathOptions={{
-    color: "red",
-    fillColor: "red",
-    fillOpacity: 0.2,
+    color: "blue",
+    fillColor: "lightblue",
+    fillOpacity: 0.3,
+    weight: 3,
   }}
 />
     <ChangeMapView
@@ -163,33 +164,77 @@ function Dashboard() {
       ]}
     >
       <Popup>
-        <div>
-          <strong>{vehicle.vehicleId}</strong>
+  <div>
 
-          <br />
+    <strong>{vehicle.vehicleId}</strong>
 
-          Fleet: {vehicle.fleetId}
+    <br />
 
-          <br />
+    Fleet : {vehicle.fleetId}
 
-          Speed: {vehicle.location.speed} km/h
+    <br />
 
-          <br />
+    Speed : {vehicle.location.speed} km/h
 
-          <strong>
-            Status:
-            {inside
-              ? " 🟢 Inside Geofence"
-              : " 🔴 Outside Geofence"}
-          </strong>
-        </div>
-      </Popup>
+    <br />
+
+    Latitude : {vehicle.location.latitude}
+
+    <br />
+
+    Longitude : {vehicle.location.longitude}
+
+    <br />
+
+    <strong>
+      {inside
+        ? "🟢 Inside Geofence"
+        : "🔴 Outside Geofence"}
+    </strong>
+
+  </div>
+</Popup>
     </Marker>
   );
 
 })}
 
   </MapContainer>
+  <div style={{ marginTop: "15px" }}>
+  {vehicles.map((vehicle) => {
+    const inside = isVehicleInsideGeofence(
+      vehicle.location.latitude,
+      vehicle.location.longitude,
+      geofence
+    );
+
+    return (
+      <div
+        key={vehicle.vehicleId}
+        style={{
+          padding: "10px",
+          marginBottom: "8px",
+          border: "1px solid #ddd",
+          borderRadius: "8px",
+        }}
+      >
+        <strong>{vehicle.vehicleId}</strong>
+
+        <br />
+
+        {inside ? (
+          <span style={{ color: "green" }}>
+            🟢 Vehicle Inside Geofence
+          </spans>
+        ) : (
+          <span style={{ color: "red" }}>
+            🔴 Vehicle Outside Geofence
+          </span>
+        )}
+      </div>
+    );
+  })}
+</div>
 </section>
 
       <section className="terminal-panel glass"><div className="terminal-header"><span className="dot red" /><span className="dot yellow" /><span className="dot green" /><span className="terminal-title">Geofence Alerts</span></div>
