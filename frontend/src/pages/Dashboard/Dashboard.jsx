@@ -52,10 +52,29 @@ function Dashboard() {
   const { vehicles, events, alerts, sendLocation, joinFleet, joinedFleet } = useVehicleLocations();
   const [location, setLocation] = useState(sampleLocation);
   const [sendError, setSendError] = useState("");
+  const [breachMessage, setBreachMessage] = useState("");
 
   useEffect(() => {
     if (isConnected) joinFleet("fleet-001");
   }, [isConnected, joinFleet]);
+  useEffect(() => {
+  if (vehicles.length === 0) return;
+
+  const vehicle = vehicles[0];
+
+  const inside = isVehicleInsideGeofence(
+    vehicle.location.latitude,
+    vehicle.location.longitude,
+    geofence
+  );
+
+  if (inside) {
+    setBreachMessage("🟢 Vehicle is inside the geofence.");
+  } else {
+    setBreachMessage("🔴 Vehicle is outside the geofence.");
+  }
+}, [vehicles]);
+
 
   const updateField = (field, value) => setLocation((current) => ({ ...current, [field]: value }));
   const handleJoinFleet = () => {
@@ -119,7 +138,22 @@ function Dashboard() {
     <MapPin className="card-icon" />
     <h3>Fleet Live Map</h3>
   </div>
-
+  
+  {breachMessage && (
+  <div
+    style={{
+      backgroundColor: "#fff3cd",
+      color: "#856404",
+      padding: "10px",
+      marginBottom: "10px",
+      border: "1px solid #ffeeba",
+      borderRadius: "8px",
+      fontWeight: "bold",
+    }}
+  >
+    {breachMessage}
+  </div>
+)}
   <MapContainer
     center={[12.9716, 77.5946]}
     zoom={12}
@@ -225,7 +259,7 @@ function Dashboard() {
         {inside ? (
           <span style={{ color: "green" }}>
             🟢 Vehicle Inside Geofence
-          </spans>
+          </span>
         ) : (
           <span style={{ color: "red" }}>
             🔴 Vehicle Outside Geofence
