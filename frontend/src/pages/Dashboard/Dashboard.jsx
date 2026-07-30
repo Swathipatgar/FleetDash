@@ -37,6 +37,7 @@ const sampleLocation = {
   longitude: 77.5946,
   speed: 72,
 };
+
 function ChangeMapView({ center }) {
   const map = useMap();
 
@@ -159,6 +160,30 @@ function Dashboard() {
     zoom={12}
     style={{ height: "400px", width: "100%", borderRadius: "10px" }}
   >
+  <div
+  style={{
+    marginTop: "15px",
+    padding: "15px",
+    border: "1px solid #ddd",
+    borderRadius: "10px",
+    background: "#f8f9fa",
+  }}
+>
+  <h3>Geofence Details</h3>
+
+  <p>
+    <strong>Name:</strong> Fleet Main Zone
+  </p>
+
+  <p>
+    <strong>Radius:</strong> {geofence.radius} meters
+  </p>
+
+  <p>
+    <strong>Center:</strong>
+    {geofence.center[0]}, {geofence.center[1]}
+  </p>
+</div>
   <Circle
   center={geofence.center}
   radius={geofence.radius}
@@ -169,6 +194,65 @@ function Dashboard() {
     weight: 3,
   }}
 />
+<table
+  border="1"
+  cellPadding="8"
+  style={{
+    width: "100%",
+    marginTop: "20px",
+    borderCollapse: "collapse",
+  }}
+>
+  <thead>
+    <tr>
+      <th>Vehicle</th>
+      <th>Fleet</th>
+      <th>Speed</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <div
+  style={{
+    marginBottom: "15px",
+    padding: "10px",
+    background: "#0d6efd",
+    color: "white",
+    borderRadius: "8px",
+  }}
+>
+  <h3>Total Vehicles : {vehicles.length}</h3>
+</div>
+    {vehicles.map((vehicle) => {
+
+      const inside = isVehicleInsideGeofence(
+        vehicle.location.latitude,
+        vehicle.location.longitude,
+        geofence
+      );
+
+      return (
+        <tr key={vehicle.vehicleId}>
+
+          <td>{vehicle.vehicleId}</td>
+
+          <td>{vehicle.fleetId}</td>
+
+          <td>{vehicle.location.speed} km/h</td>
+
+          <td>
+            {inside
+              ? "🟢 Inside"
+              : "🔴 Outside"}
+          </td>
+
+        </tr>
+      );
+    })}
+  </tbody>
+</table>
+
     <ChangeMapView
   center={[
     location.latitude,
@@ -198,6 +282,21 @@ function Dashboard() {
       ]}
     >
       <Popup>
+        <br />
+
+Latitude :
+{vehicle.location.latitude}
+
+<br />
+
+Longitude :
+{vehicle.location.longitude}
+<br />
+
+Last Updated :
+
+{new Date(vehicle.updatedAt).toLocaleString()}
+
   <div>
 
     <strong>{vehicle.vehicleId}</strong>
@@ -280,5 +379,8 @@ function Dashboard() {
     </main>
   </div>;
 }
+{vehicles.length === 0 && (
+  <h3>No Vehicles Available</h3>
+)}
 
 export default Dashboard;
