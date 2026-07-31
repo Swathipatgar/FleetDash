@@ -118,6 +118,17 @@ function Dashboard() {
           <div className="stat-row"><span className="label">Latest event</span><span className="text-small">{events[0] ? new Date(events[0].updatedAt).toLocaleTimeString() : "Waiting�"}</span></div>
         </div></div>
       </section>
+      <div
+  style={{
+    background: "#007bff",
+    color: "white",
+    padding: "10px",
+    borderRadius: "8px",
+    marginBottom: "15px",
+  }}
+>
+  <h3>Total Vehicles: {vehicles.length}</h3>
+</div>
 
       <section className="location-grid">
         <form className="status-card glass location-form" onSubmit={publishLocation}><div className="card-header"><Send className="card-icon" /><h3>Send test location</h3></div>
@@ -139,6 +150,63 @@ function Dashboard() {
     <MapPin className="card-icon" />
     <h3>Fleet Live Map</h3>
   </div>
+  <div
+  style={{
+    marginTop: "20px",
+    padding: "15px",
+    border: "1px solid #ddd",
+    borderRadius: "10px",
+    background: "#f8f9fa",
+  }}
+>
+  <h3>Vehicle Information</h3>
+
+  {vehicles.length === 0 ? (
+    <p>No vehicle data available.</p>
+  ) : (
+    vehicles.map((vehicle) => {
+      const inside = isVehicleInsideGeofence(
+        vehicle.location.latitude,
+        vehicle.location.longitude,
+        geofence
+      );
+
+      return (
+        <div
+          key={vehicle.vehicleId}
+          style={{
+            marginBottom: "15px",
+            padding: "10px",
+            border: "1px solid #ccc",
+            borderRadius: "8px",
+          }}
+        >
+          <p><strong>Vehicle ID:</strong> {vehicle.vehicleId}</p>
+
+          <p><strong>Fleet ID:</strong> {vehicle.fleetId}</p>
+
+          <p><strong>Speed:</strong> {vehicle.location.speed} km/h</p>
+
+          <p>
+            <strong>Status:</strong>{" "}
+            {inside ? "🟢 Inside Geofence" : "🔴 Outside Geofence"}
+          </p>
+
+          <p>
+            <strong>Location:</strong>{" "}
+            {vehicle.location.latitude},
+            {vehicle.location.longitude}
+          </p>
+
+          <p>
+            <strong>Updated:</strong>{" "}
+            {new Date(vehicle.updatedAt).toLocaleString()}
+          </p>
+        </div>
+      );
+    })
+  )}
+</div>
   
   {breachMessage && (
   <div
