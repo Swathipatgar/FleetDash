@@ -76,7 +76,6 @@ function Dashboard() {
   }
 }, [vehicles]);
 
-
   const updateField = (field, value) => setLocation((current) => ({ ...current, [field]: value }));
   const handleJoinFleet = () => {
     setSendError("");
@@ -98,8 +97,27 @@ function Dashboard() {
       if (!result?.ok) setSendError(result?.error || "Location update failed.");
     });
   };
+  const insideVehicles = vehicles.filter((vehicle) =>
+  isVehicleInsideGeofence(
+    vehicle.location.latitude,
+    vehicle.location.longitude,
+    geofence
+  )
+);
 
-  return <div className="dashboard-container">
+const outsideVehicles = vehicles.filter(
+  (vehicle) =>
+    !isVehicleInsideGeofence(
+      vehicle.location.latitude,
+      vehicle.location.longitude,
+      geofence
+    )
+);
+  
+
+
+  return 
+  <div className="dashboard-container">
     <header className="dashboard-header glass"><div className="brand"><Activity className="brand-icon pulse" /><div><h1>FleetDash</h1><span className="badge-beta">{joinedFleet ? `Joined ${joinedFleet}` : "Live Location Streaming"}</span></div></div>
       <span className={`status-pill ${isConnected ? "online" : "offline"}`}>{isConnected ? <Wifi size={14} className="pulse" /> : <WifiOff size={14} />}{isConnected ? "Connected" : "Disconnected"}</span>
     </header>
@@ -127,8 +145,23 @@ function Dashboard() {
     marginBottom: "15px",
   }}
 >
-  <h3>Total Vehicles: {vehicles.length}</h3>
+  <strong>Current Fleet:</strong> {joinedFleet || "Not Joined"}
 </div>
+<div
+  style={{
+    background: "#007bff",
+    color: "white",
+    padding: "10px",
+    borderRadius: "8px",
+    marginBottom: "15px",
+  }}
+>
+  <strong>Current Fleet:</strong> {joinedFleet || "Not Joined"}
+  <br />
+  <strong>Total Vehicles:</strong> {vehicles.length}
+</div>
+  
+  <h3>Total Vehicles: {vehicles.length}</h3>
 
       <section className="location-grid">
         <form className="status-card glass location-form" onSubmit={publishLocation}><div className="card-header"><Send className="card-icon" /><h3>Send test location</h3></div>
@@ -148,6 +181,53 @@ function Dashboard() {
       <section className="status-card glass">
   <div className="card-header">
     <MapPin className="card-icon" />
+    <section
+  style={{
+    display: "flex",
+    gap: "15px",
+    marginBottom: "20px",
+    flexWrap: "wrap",
+  }}
+>
+  <div
+    style={{
+      flex: 1,
+      padding: "15px",
+      background: "#0d6efd",
+      color: "white",
+      borderRadius: "10px",
+    }}
+  >
+    <h3>Total Vehicles</h3>
+    <h2>{vehicles.length}</h2>
+  </div>
+
+  <div
+    style={{
+      flex: 1,
+      padding: "15px",
+      background: "#198754",
+      color: "white",
+      borderRadius: "10px",
+    }}
+  >
+    <h3>Inside Geofence</h3>
+    <h2>{insideVehicles.length}</h2>
+  </div>
+
+  <div
+    style={{
+      flex: 1,
+      padding: "15px",
+      background: "#dc3545",
+      color: "white",
+      borderRadius: "10px",
+    }}
+  >
+    <h3>Outside Geofence</h3>
+    <h2>{outsideVehicles.length}</h2>
+  </div>
+</section>
     <h3>Fleet Live Map</h3>
   </div>
   <div
@@ -223,12 +303,7 @@ function Dashboard() {
     {breachMessage}
   </div>
 )}
-  <MapContainer
-    center={[12.9716, 77.5946]}
-    zoom={12}
-    style={{ height: "400px", width: "100%", borderRadius: "10px" }}
-  >
-  <div
+<div
   style={{
     marginTop: "15px",
     padding: "15px",
@@ -248,10 +323,15 @@ function Dashboard() {
   </p>
 
   <p>
-    <strong>Center:</strong>
-    {geofence.center[0]}, {geofence.center[1]}
+    <strong>Center:</strong> {geofence.center[0]}, {geofence.center[1]}
   </p>
 </div>
+  <MapContainer
+    center={[12.9716, 77.5946]}
+    zoom={12}
+    style={{ height: "400px", width: "100%", borderRadius: "10px" }}
+  >
+  
   <Circle
   center={geofence.center}
   radius={geofence.radius}
@@ -262,15 +342,7 @@ function Dashboard() {
     weight: 3,
   }}
 />
-<table
-  border="1"
-  cellPadding="8"
-  style={{
-    width: "100%",
-    marginTop: "20px",
-    borderCollapse: "collapse",
-  }}
->
+
   <thead>
     <tr>
       <th>Vehicle</th>
@@ -319,7 +391,6 @@ function Dashboard() {
       );
     })}
   </tbody>
-</table>
 
     <ChangeMapView
   center={[
@@ -376,6 +447,7 @@ Last Updated :
     <br />
 
     Speed : {vehicle.location.speed} km/h
+
 
     <br />
 
@@ -447,8 +519,6 @@ Last Updated :
     </main>
   </div>;
 }
-{vehicles.length === 0 && (
-  <h3>No Vehicles Available</h3>
-)}
+
 
 export default Dashboard;
