@@ -54,6 +54,7 @@ function Dashboard() {
   const [location, setLocation] = useState(sampleLocation);
   const [sendError, setSendError] = useState("");
   const [breachMessage, setBreachMessage] = useState("");
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     if (isConnected) joinFleet("fleet-001");
@@ -112,6 +113,9 @@ const outsideVehicles = vehicles.filter(
       vehicle.location.longitude,
       geofence
     )
+);
+const filteredVehicles = vehicles.filter((vehicle) =>
+  vehicle.vehicleId.toLowerCase().includes(search.toLowerCase())
 );
   
 
@@ -173,7 +177,23 @@ const outsideVehicles = vehicles.filter(
           <label>Speed (km/h)<input type="number" min="0" value={location.speed} onChange={(e) => updateField("speed", e.target.value)} required /></label>
           {sendError && <p className="form-error">{sendError}</p>}<button disabled={!isConnected} type="submit">Broadcast location</button>
         </form>
-        <section className="status-card glass live-locations"><div className="card-header"><MapPin className="card-icon" /><h3>Latest vehicle locations</h3></div>
+        <section className="status-card glass live-locations">
+          <div className="card-header"><MapPin className="card-icon" />
+          <div style={{ marginBottom: "15px" }}>
+  <input
+    type="text"
+    placeholder="Search Vehicle ID..."
+    value={search}
+    onChange={(e) => setSearch(e.target.value)}
+    style={{
+      width: "100%",
+      padding: "10px",
+      borderRadius: "8px",
+      border: "1px solid #ccc",
+    }}
+  />
+</div>
+          <h3>Latest vehicle locations</h3></div>
           {!vehicles.length && <p className="empty-state">No location updates received yet.</p>}
           {vehicles.map((vehicle) => <article className="location-row" key={`${vehicle.fleetId}-${vehicle.vehicleId}`}><MapPin size={17} /><div><b>{vehicle.vehicleId} <small>� {vehicle.fleetId}</small></b><small>{vehicle.location.latitude.toFixed(5)}, {vehicle.location.longitude.toFixed(5)}</small></div><span><Gauge size={15} /> {vehicle.location.speed ?? 0} km/h</span><time>{new Date(vehicle.updatedAt).toLocaleTimeString()}</time></article>)}
         </section>
