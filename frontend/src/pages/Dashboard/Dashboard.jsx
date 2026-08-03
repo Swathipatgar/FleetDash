@@ -117,6 +117,7 @@ const outsideVehicles = vehicles.filter(
 const filteredVehicles = vehicles.filter((vehicle) =>
   vehicle.vehicleId.toLowerCase().includes(search.toLowerCase())
 );
+const SPEED_LIMIT = 80;
   
 
 
@@ -195,7 +196,25 @@ const filteredVehicles = vehicles.filter((vehicle) =>
 </div>
           <h3>Latest vehicle locations</h3></div>
           {!vehicles.length && <p className="empty-state">No location updates received yet.</p>}
-          {vehicles.map((vehicle) => <article className="location-row" key={`${vehicle.fleetId}-${vehicle.vehicleId}`}><MapPin size={17} /><div><b>{vehicle.vehicleId} <small>� {vehicle.fleetId}</small></b><small>{vehicle.location.latitude.toFixed(5)}, {vehicle.location.longitude.toFixed(5)}</small></div><span><Gauge size={15} /> {vehicle.location.speed ?? 0} km/h</span><time>{new Date(vehicle.updatedAt).toLocaleTimeString()}</time></article>)}
+          {filteredVehicles.map((vehicle) => <article className="location-row" key={`${vehicle.fleetId}-${vehicle.vehicleId}`}><MapPin size={17} /><div><b>{vehicle.vehicleId} <small>� {vehicle.fleetId}</small></b><small>{vehicle.location.latitude.toFixed(5)}, {vehicle.location.longitude.toFixed(5)}
+            </small></div>
+            <div>
+  <span>
+    <Gauge size={15} /> {vehicle.location.speed ?? 0} km/h
+  </span>
+
+  {vehicle.location.speed > SPEED_LIMIT && (
+    <div
+      style={{
+        color: "red",
+        fontWeight: "bold",
+        marginTop: "5px",
+      }}
+    >
+      ⚠ Overspeed Alert
+    </div>
+  )}
+</div><time>{new Date(vehicle.updatedAt).toLocaleTimeString()}</time></article>)}
         </section>
       </section>
       <section className="status-card glass">
@@ -249,6 +268,32 @@ const filteredVehicles = vehicles.filter((vehicle) =>
   </div>
 </section>
     <h3>Fleet Live Map</h3>
+  </div>
+  <section className="status-card glass">
+  <div className="card-header">
+    <MapPin className="card-icon" />
+    <h3>Fleet Live Map</h3>
+  </div>
+
+  {/* Overspeed Summary */}
+  <div
+    style={{
+      background: "#fff3cd",
+      border: "1px solid #ffeeba",
+      padding: "15px",
+      borderRadius: "10px",
+      marginBottom: "20px",
+    }}
+  >
+    <h3>Overspeed Vehicles</h3>
+
+    <h2>
+      {
+        vehicles.filter(
+          (vehicle) => vehicle.location.speed > SPEED_LIMIT
+        ).length
+      }
+    </h2>
   </div>
   <div
   style={{
@@ -434,13 +479,24 @@ const filteredVehicles = vehicles.filter((vehicle) =>
 
   return (
     <Marker
-      key={vehicle.vehicleId}
-      position={[
-        vehicle.location.latitude,
-        vehicle.location.longitude,
-      ]}
-    >
+  key={vehicle.vehicleId}
+  position={[
+    vehicle.location.latitude,
+    vehicle.location.longitude,
+  ]}
+>
       <Popup>
+        <br />
+
+{vehicle.location.speed > SPEED_LIMIT ? (
+  <span style={{ color: "red", fontWeight: "bold" }}>
+    ⚠ Overspeed
+  </span>
+) : (
+  <span style={{ color: "green", fontWeight: "bold" }}>
+    ✔ Normal Speed
+  </span>
+)}
         <br />
 
 Latitude :
