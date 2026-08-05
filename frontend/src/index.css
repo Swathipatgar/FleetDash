@@ -4,14 +4,18 @@
   font-weight: 400;
 
   color-scheme: dark;
+  color: #ad6f6f;
+
+
   --bg-color: #0b0f19;
   --panel-bg: rgba(17, 24, 39, 0.7);
   --panel-border: rgba(255, 255, 255, 0.08);
   
   --primary: #3b82f6;
   --primary-glow: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
   
-  --success: #10b981;
+  --success: #7fb1a0;
   --success-glow: rgba(16, 185, 129, 0.15);
   
   --warning: #f59e0b;
