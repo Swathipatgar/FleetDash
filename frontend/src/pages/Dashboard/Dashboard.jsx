@@ -121,7 +121,7 @@ const SPEED_LIMIT = 80;
   
 
 
-  return 
+  return(
   <div className="dashboard-container">
     <header className="dashboard-header glass"><div className="brand"><Activity className="brand-icon pulse" /><div><h1>FleetDash</h1><span className="badge-beta">{joinedFleet ? `Joined ${joinedFleet}` : "Live Location Streaming"}</span></div></div>
       <span className={`status-pill ${isConnected ? "online" : "offline"}`}>{isConnected ? <Wifi size={14} className="pulse" /> : <WifiOff size={14} />}{isConnected ? "Connected" : "Disconnected"}</span>
@@ -138,9 +138,10 @@ const SPEED_LIMIT = 80;
         <div className="status-card glass"><div className="card-header"><Info className="card-icon" /><h3>Live fleet feed</h3></div><div className="card-body">
           <div className="stat-row"><span className="label">Tracked vehicles</span><b>{vehicles.length}</b></div>
           <div className="stat-row"><span className="label">Joined fleet</span><span className="font-mono text-small">{joinedFleet || "None"}</span></div>
-          <div className="stat-row"><span className="label">Latest event</span><span className="text-small">{events[0] ? new Date(events[0].updatedAt).toLocaleTimeString() : "Waiting�"}</span></div>
+          <div className="stat-row"><span className="label">Latest event</span><span className="text-small">{events[0] ? new Date(events[0].updatedAt).toLocaleTimeString() : "Waiting"}</span></div>
         </div></div>
       </section>
+      );
       <div
   style={{
     background: "#007bff",
@@ -149,8 +150,8 @@ const SPEED_LIMIT = 80;
     borderRadius: "8px",
     marginBottom: "15px",
   }}
->
-  <strong>Current Fleet:</strong> {joinedFleet || "Not Joined"}
+><br />
+  <strong>Total Vehicles:</strong> {vehicles.length}
 </div>
 <div
   style={{
@@ -196,7 +197,7 @@ const SPEED_LIMIT = 80;
 </div>
           <h3>Latest vehicle locations</h3></div>
           {!vehicles.length && <p className="empty-state">No location updates received yet.</p>}
-          {filteredVehicles.map((vehicle) => <article className="location-row" key={`${vehicle.fleetId}-${vehicle.vehicleId}`}><MapPin size={17} /><div><b>{vehicle.vehicleId} <small>� {vehicle.fleetId}</small></b><small>{vehicle.location.latitude.toFixed(5)}, {vehicle.location.longitude.toFixed(5)}
+          {filteredVehicles.map((vehicle) => <article className="location-row" key={`${vehicle.fleetId}-${vehicle.vehicleId}`}><MapPin size={17} /><div><b>{vehicle.vehicleId} <small> -  {vehicle.fleetId}</small></b><small>{vehicle.location.latitude.toFixed(5)}, {vehicle.location.longitude.toFixed(5)}
             </small></div>
             <div>
   <span>
